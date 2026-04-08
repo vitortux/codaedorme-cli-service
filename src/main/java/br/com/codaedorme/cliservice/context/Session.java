@@ -5,6 +5,7 @@ import lombok.Getter;
 import org.springframework.stereotype.Component;
 
 import br.com.codaedorme.cliservice.domain.dto.UserDTO;
+import br.com.codaedorme.cliservice.domain.enumeration.UserGroupEnum;
 
 @Getter
 @Component
@@ -26,5 +27,9 @@ public class Session {
 
 	public boolean isAuthenticated() {
 		return token != null && user != null;
+	}
+
+	public boolean isAdmin() {
+		return this.user.getUserGroup().equals(UserGroupEnum.ADMINISTRADOR);
 	}
 }

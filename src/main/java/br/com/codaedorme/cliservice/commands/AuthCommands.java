@@ -1,25 +1,25 @@
 package br.com.codaedorme.cliservice.commands;
 
-import lombok.RequiredArgsConstructor;
-
 import org.springframework.shell.core.command.CommandContext;
 import org.springframework.shell.core.command.annotation.Command;
 import org.springframework.shell.core.command.annotation.Option;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.RestTemplate;
 
+import br.com.codaedorme.cliservice.context.Session;
+import br.com.codaedorme.cliservice.domain.dto.LoginDTO;
 import br.com.codaedorme.cliservice.domain.dto.UserDTO;
 import br.com.codaedorme.cliservice.domain.enumeration.UserGroupEnum;
 
 @Component
-@RequiredArgsConstructor
-public class AuthCommands {
+public class AuthCommands extends BaseCommands {
 
-	private static final String BASE_URL = "http://localhost:8080/users";
+	private static final String BASE_URL = "http://localhost:8080/auth";
 
-	private static final RestTemplate restTemplate = new RestTemplate();
+	public AuthCommands(Session session) {
+		super(session);
+	}
 
-	@Command(name = "auth register", group = "auth", description = "Cadastro de usuário")
+	@Command(name = "auth register", group = "auth", description = "Cadastro de usuário", availabilityProvider = "admin")
 	public String register(
 			CommandContext ctx,
 			@Option(shortName = 'n', longName = "name", required = true) String name,
@@ -41,7 +41,7 @@ public class AuthCommands {
 					.name(name)
 					.email(email)
 					.cpf(cpf)
-					.group(groupEnum)
+					.userGroup(groupEnum)
 					.password(pwd)
 					.build();
 
@@ -51,6 +51,23 @@ public class AuthCommands {
 			return "Usuário ID " + id + " cadastrado com sucesso!";
 		} catch (Exception e) {
 			return "Erro ao cadastrar usuário: " + e.getMessage();
+		}
+	}
+
+	@Command(name = "auth login", group = "auth", description = "Login na aplicação")
+	public String login(
+			@Option(shortName = 'e', longName = "email", required = true) String email,
+			@Option(shortName = 'p', longName = "password", required = true) String password) {
+
+		try {
+			LoginDTO credentials = new LoginDTO(email, password);
+			UserDTO loggedUser = restTemplate.postForEntity(BASE_URL + "/login", credentials, UserDTO.class).getBody();
+
+			session.login("token", loggedUser);
+			System.out.println("Login realizado com sucesso! Bem-vindo, " + loggedUser.getName() + "!");
+			return "Dados da sessão: " + loggedUser.toString();
+		} catch (Exception e) {
+			return "Erro ao realizar login: " + e.getMessage();
 		}
 	}
 }

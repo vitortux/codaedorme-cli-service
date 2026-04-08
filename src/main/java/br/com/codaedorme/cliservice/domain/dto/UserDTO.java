@@ -1,7 +1,9 @@
 package br.com.codaedorme.cliservice.domain.dto;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
@@ -12,6 +14,8 @@ import br.com.codaedorme.cliservice.domain.enumeration.UserGroupEnum;
 @Setter
 @Builder
 @ToString
+@NoArgsConstructor
+@AllArgsConstructor
 public class UserDTO {
 
 	private Long id;
@@ -22,7 +26,7 @@ public class UserDTO {
 
 	private String cpf;
 
-	private UserGroupEnum group;
+	private UserGroupEnum userGroup;
 
 	private StatusEnum status;
 
